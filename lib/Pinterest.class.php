@@ -178,7 +178,7 @@ class Pinterest {
      */
     private function putCache($key, $contents)
     {
-        $cache_file = __DIR__ . "/" . $this->cacheprefix . $key . ".cache";
+        $cache_file = __DIR__ . "/" . $this->cacheprefix . str_replace("/", "_", $key) . ".cache";
     
         // Create a file and put the contents in it
         file_put_contents($cache_file, $contents, LOCK_EX);
