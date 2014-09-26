@@ -10,7 +10,7 @@
  *
  * @author     Dirk Groenen <dirk@taketwo.nl>
  * @copyright  2014 - TakeTwo Merkidentiteit
- * @version    1.0
+ * @version    1.1
  */
 
 class Pinterest {
@@ -28,6 +28,11 @@ class Pinterest {
     public function __construct($username)
     {
         $this->username = $username;
+        
+        // Check if the cache directory exists
+        if(!file_exists(dirname(__FILE__) . "/cache")){
+            mkdir(dirname(__FILE__) . "/cache", 0775);
+        }
     }
 
     /* 
@@ -44,6 +49,20 @@ class Pinterest {
         {
             // Create get request and put it in the cache
             $boards = $this->GET("http://pinterestapi.co.uk/" . $this->username . "/boards");
+
+
+            // Get first pin from the board 
+            foreach($boards->body as $board){
+                // Split the board->href
+                $href = explode("/", $board->href);
+                $boardhref = $href[2];
+                $pinsdata = $this->getPinsFromBoard($boardhref, true);
+
+                // Get the image url and replace the board's src with the image from the pin
+                $image = $pinsdata[0]->images->{'237x'}->url;
+                $board->src = $image;
+            }
+
             $this->putCache("boards_" . $this->username, json_encode($boards));
         }
         else
@@ -69,6 +88,7 @@ class Pinterest {
         {
             // Create get request and put it in the cache
             $pins = $this->GET("https://api.pinterest.com/v3/pidgets/boards/" . $this->username . "/" . $board . "/pins/");
+
             $this->putCache($board, json_encode($pins));
         }
         else
@@ -155,7 +175,8 @@ class Pinterest {
      */
     private function getCache($key)
     {
-        $cache_file = __DIR__ . "/" . $this->cacheprefix . $key . ".cache";
+        $key = str_replace("/", "-", $key);
+        $cache_file = dirname(__FILE__) . "/" . $this->cacheprefix . $key . ".cache";
         
         if (file_exists($cache_file) && (filemtime($cache_file) > (time() - 60 * 60 ))) 
         {
@@ -178,7 +199,8 @@ class Pinterest {
      */
     private function putCache($key, $contents)
     {
-        $cache_file = __DIR__ . "/" . $this->cacheprefix . str_replace("/", "_", $key) . ".cache";
+        $key = str_replace("/", "-", $key);
+        $cache_file =  dirname(__FILE__) . "/" . $this->cacheprefix . $key . ".cache";
     
         // Create a file and put the contents in it
         file_put_contents($cache_file, $contents, LOCK_EX);
