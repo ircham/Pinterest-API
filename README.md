@@ -13,13 +13,13 @@ Currently there are three methods within this API. One for retrieving all the bo
     $pinterest = new Pinterest($accountname); // Create a new instance and give the accountname
 
     // Get pins from a board
-    $pinterest->api->getPinsFromBoard($boardname);
+    $pinterest->getPinsFromBoard($boardname);
     
     // Get all pins
-    $pinterest->api->getPins();
+    $pinterest->getPins();
     
     // Get all boards
-    $pinterest->api->getBoards();
+    $pinterest->getBoards();
 ?>
 ```
 
@@ -48,7 +48,7 @@ Image size
 The API only returns the 237x image size, but with a simple ```str_replace()``` you can also retrieve the bigger (736x) image.
 ```
 <?php
-    $pinsresult = $pinterest->api->getPins();
+    $pinsresult = $pinterest->getPins();
     
     foreach( $pinsresult["data"] as $pin ){
         $bigimage = str_replace("237x", "736x", $pin->images->{'237x'}->url);
