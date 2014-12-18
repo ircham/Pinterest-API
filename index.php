@@ -5,7 +5,7 @@
     require_once("lib/Pinterest.class.php");
     
     // Create new instance of the Pinterest API
-    $pinterest = new Pinterest("reverinterieur");
+    $pinterest = new Pinterest("pinterest");
     
     // Check if a page has to be set
     if(isset($_GET['page'])){
