@@ -17,7 +17,7 @@ class Pinterest {
 
     private $username;
     private $cacheprefix = "cache/pinterest_";
-    public $itemsperpage = 25;
+    public $itemsperpage = 50;
     public $currentpage = 1;
     
     /* 
@@ -53,10 +53,7 @@ class Pinterest {
 
             // Get first pin from the board 
             foreach($boards->body as $board){
-                // Split the board->href
-                $href = explode("/", $board->href);
-                $boardhref = $href[2];
-                $pinsdata = $this->getPinsFromBoard($boardhref, true);
+                $pinsdata = $this->getPinsFromBoard($board->href, true);
 
                 // Get the image url and replace the board's src with the image from the pin
                 $image = $pinsdata[0]->images->{'237x'}->url;
@@ -82,12 +79,16 @@ class Pinterest {
      */
     public function getPinsFromBoard($board, $intern = false)
     {
+        // Check if the board is full url or just a single board name
+        if(!preg_match("/\/(.*)\/(.*)\//", $board))
+            $board = "/" . $this->username . "/" . $board . "/";
+
         // Check for cache existence
         $cachedata = $this->getCache($board);
         if($cachedata == false)
         {
             // Create get request and put it in the cache
-            $pins = $this->GET("https://api.pinterest.com/v3/pidgets/boards/" . $this->username . "/" . $board . "/pins/");
+            $pins = $this->GET("https://api.pinterest.com/v3/pidgets/boards" . $board . "pins/");
 
             $this->putCache($board, json_encode($pins));
         }
@@ -120,12 +121,8 @@ class Pinterest {
         
         // Go through all boards
         foreach($boards as $board){
-            // Split the board->href
-            $href = explode("/", $board->href);
-            $boardhref = $href[2];
-            
             // Request the pins from the board
-            $pinsdata = $this->getPinsFromBoard($boardhref, true);
+            $pinsdata = $this->getPinsFromBoard($board->href, true);
             
             // Loop through all pins and put them in the pins array
             foreach($pinsdata as $pin){
