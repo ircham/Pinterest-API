@@ -10,7 +10,7 @@
  *
  * @author     Dirk Groenen <dirk@taketwo.nl>
  * @copyright  2014 - TakeTwo Merkidentiteit
- * @version    1.1
+ * @version    1.1.1
  */
 
 class Pinterest {
